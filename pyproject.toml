@@ -41,3 +41,8 @@ haste = [
 [project.urls]
 Homepage = "https://scaledown.ai"
 Issues = "https://github.com/scaledown-team/scaledown"
+
+[tool.uv.workspace]
+members = [
+    "backend",
+]
