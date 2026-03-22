@@ -67,7 +67,7 @@ graph TD
 ```
 
 ---
-
+```
 scaledown-policy-dashboard/
 ├── backend/            # FastAPI server & AI logic
 │   ├── main.py         # Core API endpoints & caching layer
@@ -77,7 +77,7 @@ scaledown-policy-dashboard/
 │   ├── src/            # Components, pages, and hooks
 │
 └── scaledown/          # ScaleDown core framewor
-
+```
 
 
 ## 📈 Measurable Results
@@ -97,7 +97,6 @@ ScaleDown is built for production-grade reliability:
 
 - **Enterprise Code Search**: Navigate million-line repositories with sub-second retrieval.
 - **Regulatory Monitoring**: Automated compliance tracking with high-density extraction of rules and penalties.
-- **Multi-Agent Coordination**: Scales to 10+ agents with minimal token overhead via shared compressed memory.
 
 ---
 
