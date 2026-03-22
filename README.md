@@ -1,11 +1,10 @@
-# ⚡ ScaleDown: Intelligent Context Optimization & Multi-Agent Intelligence
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![React](https://img.shields.io/badge/frontend-React-61dafb.svg)](https://reactjs.org/)
-[![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
-
 **ScaleDown** is a high-performance framework designed to solve the **"Context Window Bottleneck"** in modern LLM applications. By utilizing **AST-guided selection (HASTE)** and **intelligent prompt compression**, ScaleDown enables developers to feed massive codebases and complex real-time data into LLMs while reducing token usage by up to **70%+** without losing critical intent.
+
+- *⚡ Real-Time Aggregation:* Scrapes live data from government portals, PIB, Parliament, and news sources using Tavily.
+- *🧠 AI-Powered Summarization:* Utilizes the ScaleDown compressor to generate highly dense, readable summaries from dense policy texts, extracting key rules and penalties.
+- *🎯 Entity-Based Filtering:* Easily filter policies by target demographic (e.g., Startups, Taxpayers, Farmers, Healthcare).
+- *📊 Real-time Dashboard:* A modern, citizen-focused frontend built with React & Vite.
+- *⚙️ Automated Categorization:* Automatically determines ministry, source, policy type (bill, act, notification), and importance level.
 
 ---
 
@@ -39,21 +38,6 @@ An API-powered service that reformulates context for maximum token efficiency us
 - **Semantic Condensation**: Converts verbose explanations into high-density tokens.
 - **Context Prioritization**: Dynamically ranks information based on the specific query intent.
 
-### 3. 🤖 Deep Research Agent Swarm
-
-A collaborative team of specialized agents (Researcher, Critic, Synthesizer, Writer) coordinated via **LangGraph**.
-
-- **Consensus Mechanism**: Automated cross-verification between agents.
-- **IEEE Formatting**: Generates professional, academic-grade research papers from raw web data.
-
-### 4. 📊 Real-time Policy Dashboard
-
-A cutting-edge monitoring system for government policies and regulations.
-
-- **Tavily Integration**: Real-time web search restricted to trusted government sources (PIB, MeitY, Gazette).
-- **ScaleDown Summarization**: High-density policy extraction (Rules, Penalties, Impact).
-
----
 
 ## 📐 System Architecture & Workflow
 
@@ -79,6 +63,18 @@ graph TD
 ```
 
 ---
+
+scaledown-policy-dashboard/
+├── backend/            # FastAPI server & AI logic
+│   ├── main.py         # Core API endpoints & caching layer
+│   ├── search/         # Tavily search integration
+│   └── summarizer/     # ScaleDown LLM summarizers
+├── frontend/           # React + Vite UI
+│   ├── src/            # Components, pages, and hooks
+│
+└── scaledown/          # ScaleDown core framewor
+
+
 
 ## 📈 Measurable Results
 
@@ -140,6 +136,19 @@ pip install scaledown[haste]
 | **Backend**  | FastAPI, Pydantic, Httpx, Tavily             |
 | **AI/ML**    | ScaleDown Core, OpenAI (GPT-4o), Tree-sitter |
 | **Tools**    | LangGraph, FAISS, BM25, Python               |
+
+---
+
+
+## 🔌 API Endpoints
+
+The FastAPI backend provides several endpoints for the dashboard:
+
+- GET /api/dashboard - Get full dashboard stats, policies, and latest news.
+- GET /api/policies - Get filtered lists of policies.
+- GET /api/news - Get policy-related news updates.
+- GET /api/stats - Get summary statistics of the cached data.
+- POST /api/refresh - Manually trigger a Tavily data scrape and LLM summarization.
 
 ---
 
