@@ -1,4 +1,5 @@
-**ScaleDown** is a high-performance framework designed to solve the **"Context Window Bottleneck"** in modern LLM applications. By utilizing **AST-guided selection (HASTE)** and **intelligent prompt compression**, ScaleDown enables developers to feed massive codebases and complex real-time data into LLMs while reducing token usage by up to **70%+** without losing critical intent.
+# 🏛️ ScaleDown Policy Dashboard | Citizen Intelligence Platform
+
 
 - *⚡ Real-Time Aggregation:* Scrapes live data from government portals, PIB, Parliament, and news sources using Tavily.
 - *🧠 AI-Powered Summarization:* Utilizes the ScaleDown compressor to generate highly dense, readable summaries from dense policy texts, extracting key rules and penalties.
@@ -15,6 +16,9 @@ Modern LLMs (GPT-4, Claude 3, etc.) have expanded context windows, but processin
 1. **Expensive**: Linear token costs scale rapidly with codebase size.
 2. **Slow**: Increased input size leads to higher inference latency.
 3. **Noisy**: LLMs often "lose the middle" when context is saturated with irrelevant data.
+
+-> **ScaleDown** is a high-performance framework designed to solve the **"Context Window Bottleneck"** in modern LLM applications. By utilizing **AST-guided selection (HASTE)** and **intelligent prompt compression**, ScaleDown enables developers to feed massive codebases and complex real-time data into LLMs while reducing token usage by up to **70%+** without losing critical intent.
+
 
 **ScaleDown** solves this by acting as an **intelligent context filter**, ensuring only the most semantically relevant and structurally crucial information reaches the model.
 
