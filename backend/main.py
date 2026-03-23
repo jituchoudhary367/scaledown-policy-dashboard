@@ -44,6 +44,7 @@ class PolicyResponse(BaseModel):
     impact: str
     entities: List[str]
     importance: str = "normal"  # normal or important
+    sentiment: str = "Neutral"  # Positive, Negative, or Neutral
     scraped_at: str
 
 
@@ -71,6 +72,13 @@ class DashboardData(BaseModel):
     stats: DashboardStats
 
 
+class AnalyticsData(BaseModel):
+    by_ministry: Dict[str, int]
+    by_entity: Dict[str, int]
+    by_date: List[Dict[str, Any]]  # [{"date": "Mar 21", "count": 5}]
+    sentiment_distribution: Dict[str, int]
+
+
 # In-memory storage
 policies_cache: List[Dict] = []
 news_cache: List[Dict] = []
@@ -95,6 +103,31 @@ def determine_importance(title: str, content: str) -> str:
             return "important"
     
     return "normal"
+
+
+def determine_sentiment(title: str, summary: str, impact: str) -> str:
+    """Rule-based sentiment analysis for policy impact."""
+    text = (title + " " + summary + " " + impact).lower()
+    
+    positive_keywords = [
+        "benefit", "subsidy", "fund", "allocation", "grant", "support", 
+        "incentive", "promotion", "growth", "improvement", "simplified",
+        "lower tax", "reduced gst", "ease of", "launch", "mission"
+    ]
+    negative_keywords = [
+        "penalty", "fine", "imprisonment", "restriction", "ban", "compliance burden",
+        "audit", "tax increase", "hike", "violation", "enforcement", "mandatory",
+        "liability", "legal action"
+    ]
+    
+    pos_score = sum(1 for k in positive_keywords if k in text)
+    neg_score = sum(1 for k in negative_keywords if k in text)
+    
+    if pos_score > neg_score:
+        return "Positive"
+    elif neg_score > pos_score:
+        return "Negative"
+    return "Neutral"
 
 
 def extract_entities(title: str, summary: str) -> List[str]:
@@ -225,6 +258,7 @@ async def fetch_real_data():
         
         # Determine metadata
         importance = determine_importance(title, content)
+        sentiment = determine_sentiment(title, summary, impact)
         entities = extract_entities(title, summary)
         ministry = determine_ministry(title, url)
         policy_type = determine_type(title)
@@ -253,6 +287,7 @@ async def fetch_real_data():
             "impact": impact,
             "entities": entities,
             "importance": importance,
+            "sentiment": sentiment,
             "scraped_at": datetime.now().isoformat()
         }
         policies.append(policy)
@@ -362,6 +397,7 @@ async def get_dashboard(
             impact=p["impact"],
             entities=p["entities"],
             importance=p.get("importance", "normal"),
+            sentiment=p.get("sentiment", "Neutral"),
             scraped_at=p["scraped_at"]
         )
         for p in filtered_policies
@@ -428,6 +464,7 @@ async def get_policies(
             impact=p["impact"],
             entities=p["entities"],
             importance=p.get("importance", "normal"),
+            sentiment=p.get("sentiment", "Neutral"),
             scraped_at=p["scraped_at"]
         )
         for p in filtered
@@ -460,6 +497,55 @@ async def get_stats():
         active_updates=len([p for p in policies_cache if (datetime.now() - datetime.fromisoformat(p["published_date"])).total_seconds() < 3600]),
         sources=list(set(p["source"] for p in policies_cache)),
         last_updated=last_fetch.isoformat()
+    )
+
+
+@app.get("/api/analytics", response_model=AnalyticsData)
+async def get_analytics():
+    """Get aggregated analytics data for charts."""
+    by_ministry = {}
+    by_entity = {}
+    by_sentiment = {"Positive": 0, "Neutral": 0, "Negative": 0}
+    
+    # Trend data: group by day for the last 7 days
+    dates_map = {}
+    for i in range(7):
+        d = (datetime.now() - timedelta(days=i)).strftime("%b %d")
+        dates_map[d] = 0
+    
+    for p in policies_cache:
+        # Ministry
+        min_name = p.get("ministry", "Unknown")
+        by_ministry[min_name] = by_ministry.get(min_name, 0) + 1
+        
+        # Sentiment
+        sent = p.get("sentiment", "Neutral")
+        by_sentiment[sent] = by_sentiment.get(sent, 0) + 1
+        
+        # Entities
+        for ent in p.get("entities", []):
+            by_entity[ent] = by_entity.get(ent, 0) + 1
+            
+        # Date Trend
+        try:
+            p_date = datetime.fromisoformat(p["published_date"]).strftime("%b %d")
+            if p_date in dates_map:
+                dates_map[p_date] += 1
+        except:
+            pass
+            
+    # Sort date trend chronologically
+    sorted_dates = []
+    current_date = datetime.now()
+    for i in range(6, -1, -1):
+        d_str = (current_date - timedelta(days=i)).strftime("%b %d")
+        sorted_dates.append({"date": d_str, "count": dates_map.get(d_str, 0)})
+        
+    return AnalyticsData(
+        by_ministry=by_ministry,
+        by_entity=by_entity,
+        by_date=sorted_dates,
+        sentiment_distribution=by_sentiment
     )
 
 

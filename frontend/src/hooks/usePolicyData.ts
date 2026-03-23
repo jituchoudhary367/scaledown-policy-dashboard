@@ -33,6 +33,13 @@ export interface DashboardStats {
     last_updated: string
 }
 
+export interface AnalyticsData {
+    by_ministry: Record<string, number>
+    by_entity: Record<string, number>
+    by_date: Array<{ date: string, count: number }>
+    sentiment_distribution: Record<string, number>
+}
+
 export interface DashboardData {
     policies: Policy[]
     news: NewsItem[]
@@ -45,6 +52,7 @@ export function usePolicyData() {
     const [policies, setPolicies] = useState<Policy[]>([])
     const [news, setNews] = useState<NewsItem[]>([])
     const [stats, setStats] = useState<DashboardStats | null>(null)
+    const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
@@ -87,6 +95,18 @@ export function usePolicyData() {
             setNews(data.news)
             setStats(data.stats)
             setLastUpdated(new Date(data.stats.last_updated))
+            
+            // Fetch analytics separately
+            try {
+                const analyticsRes = await fetch(`${API_BASE}/analytics`)
+                if (analyticsRes.ok) {
+                    const analyticsData: AnalyticsData = await analyticsRes.json()
+                    setAnalytics(analyticsData)
+                }
+            } catch (aErr) {
+                console.error('Failed to fetch analytics:', aErr)
+            }
+
             setError(null)
         } catch (err) {
             console.error('Failed to fetch policy data:', err)
@@ -135,6 +155,7 @@ export function usePolicyData() {
         policies,
         news,
         stats,
+        analytics,
         loading,
         error,
         lastUpdated,

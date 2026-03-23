@@ -17,9 +17,11 @@ import {
     TrendingUp,
     Clock,
     Star,
-    Zap
+    Zap,
+    BarChart2
 } from 'lucide-react'
 import { usePolicyData, Policy, NewsItem } from './hooks/usePolicyData'
+import { AnalyticsPanel } from './components/AnalyticsPanel'
 
 // Citizen filter definitions
 const citizenFilters = [
@@ -34,7 +36,8 @@ const citizenFilters = [
 const sources = ['All Sources', 'Parliament', 'PIB', 'MeitY', 'Gazette']
 const feedTabs = [
     { id: 'latest', label: 'Latest', icon: Clock },
-    { id: 'important', label: 'Important', icon: Star }
+    { id: 'important', label: 'Important', icon: Star },
+    { id: 'analytics', label: 'Analytics', icon: BarChart2 }
 ]
 
 function formatDate(dateString: string): string {
@@ -235,6 +238,7 @@ function App() {
         policies,
         news,
         stats,
+        analytics,
         loading,
         error,
         lastUpdated,
@@ -484,21 +488,25 @@ function App() {
                         </div>
                     )}
 
-                    {/* Policy Cards */}
-                    {filteredPolicies.length === 0 ? (
-                        <div className="empty-state">
-                            <FileText size={48} />
-                            <h3>No policies found</h3>
-                            <p>Try adjusting your filters or search query</p>
-                        </div>
+                    {/* Policy Cards or Analytics */}
+                    {filterType === 'analytics' ? (
+                        <AnalyticsPanel data={analytics} />
                     ) : (
-                        filteredPolicies.map(policy => (
-                            <PolicyCard
-                                key={policy.id}
-                                policy={policy}
-                                onViewDetails={handleViewDetails}
-                            />
-                        ))
+                        filteredPolicies.length === 0 ? (
+                            <div className="empty-state">
+                                <FileText size={48} />
+                                <h3>No policies found</h3>
+                                <p>Try adjusting your filters or search query</p>
+                            </div>
+                        ) : (
+                            filteredPolicies.map(policy => (
+                                <PolicyCard
+                                    key={policy.id}
+                                    policy={policy}
+                                    onViewDetails={handleViewDetails}
+                                />
+                            ))
+                        )
                     )}
                 </section>
 
